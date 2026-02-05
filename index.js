@@ -257,7 +257,7 @@ function executeFunction(func) {
 
 // Helper functions
 function factorial(n) {
-    if (n < 0 || n > 170) return 0;
+    if (n < 0 || n > 1000000) return 0;
     if (n <= 1) return 1;
     let result = 1;
     for (let i = 2; i <= n; i++) {
