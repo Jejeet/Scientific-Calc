@@ -1,0 +1,165 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    
+}
+:root{
+       --primary:rgb(0,123,2);
+       --secondary:rgb(255,109,0);
+}
+ 
+
+
+
+body {
+
+    background: linear-gradient(135deg, #66ea8b 0%,  #114f31 100%);
+ height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.calculator {
+    background: #114f31;
+    border-radius: 20px;
+    padding: 15px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 400px;
+    width: 100%;
+    height: 90vh;
+    margin: 5rem;
+
+}
+
+.display {
+    background: #509770;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+    text-align: right;
+    color: white;
+    word-break: break-all ;
+
+}
+
+.history {
+    font-size: 14px;
+    color: #bdc3c7;
+    min-height: 20px;
+    margin-bottom: 10px;
+}
+
+.current {
+    font-size: 2.5em;
+    font-weight: bold;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+}
+
+.btn {
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: white;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.number {
+    background:  #509770;
+}
+
+.number:hover {
+    background: var(--primary);
+}
+
+.operator {
+    background: #e74c3c;
+}
+
+.operator:hover {
+    background: #c0392b;
+}
+
+.function {
+    background: var(--secondary);
+    font-size: 14px;
+}
+
+.function:hover {
+    background: #d68910;
+}
+
+.equals {
+    background: var(--primary);
+    grid-row: span 2;
+}
+
+.equals:hover {
+    background: #229954;
+}
+
+.clear {
+    background: #95a5a6;
+    color: #2c3e50;
+}
+
+.clear:hover {
+    background: #7f8c8d;
+}
+
+.decimal {
+    background: #3498db;
+}
+
+.decimal:hover {
+    background: #2980b9;
+}
+
+.zero {
+    grid-column: span 2;
+}
+
+/* Responsive design */
+/* @media (max-width: 480px) {
+    .calculator {
+        padding: 15px;
+    }
+    
+    .btn {
+        padding: 15px;
+        font-size: 16px;
+    }
+    
+    .current {
+        font-size: 2em;
+    }
+    
+    .buttons {
+        gap: 8px;
+    }
+} */
