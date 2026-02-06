@@ -59,8 +59,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .buttons {

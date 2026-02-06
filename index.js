@@ -119,6 +119,9 @@ function calculate() {
     try {
         let expression = calculatorState.currentExpression;
         
+        // Evaluate scientific functions first
+        expression = evaluateScientificFunctions(expression);
+        
         // Handle division by zero
         expression = expression.replace(/\/\s*0(?!\d)/g, '/ 0');
         
@@ -137,6 +140,89 @@ function calculate() {
         updateDisplay('Error');
         calculatorState.shouldClearDisplay = true;
     }
+}
+
+// Evaluate scientific functions in the expression
+function evaluateScientificFunctions(expression) {
+    // Replace scientific function notations with their calculated values
+    
+    // sin, cos, tan, log, ln, sqrt, exp functions
+    expression = expression.replace(/sin\(([^)]+)\)/g, (match, value) => {
+        const num = parseFloat(value);
+        return Math.sin(toRadians(num));
+    });
+    
+    expression = expression.replace(/cos\(([^)]+)\)/g, (match, value) => {
+        const num = parseFloat(value);
+        return Math.cos(toRadians(num));
+    });
+    
+    expression = expression.replace(/tan\(([^)]+)\)/g, (match, value) => {
+        const num = parseFloat(value);
+        return Math.tan(toRadians(num));
+    });
+    
+    expression = expression.replace(/log\(([^)]+)\)/g, (match, value) => {
+        const num = parseFloat(value);
+        return num > 0 ? Math.log10(num) : 0;
+    });
+    
+    expression = expression.replace(/ln\(([^)]+)\)/g, (match, value) => {
+        const num = parseFloat(value);
+        return num > 0 ? Math.log(num) : 0;
+    });
+    
+    expression = expression.replace(/√\(([^)]+)\)/g, (match, value) => {
+        const num = parseFloat(value);
+        return num >= 0 ? Math.sqrt(num) : 0;
+    });
+    
+    expression = expression.replace(/exp\(([^)]+)\)/g, (match, value) => {
+        const num = parseFloat(value);
+        return Math.exp(num);
+    });
+    
+    // Power notation (x)²
+    expression = expression.replace(/\(([^)]+)\)²/g, (match, value) => {
+        const num = parseFloat(value);
+        return Math.pow(num, 2);
+    });
+    
+    // Factorial x!
+    expression = expression.replace(/(\d+(?:\.\d+)?)!/g, (match, value) => {
+        const num = Math.floor(parseFloat(value));
+        return factorial(num);
+    });
+    
+    // Inverse 1/(x)
+    expression = expression.replace(/1\/\(([^)]+)\)/g, (match, value) => {
+        const num = parseFloat(value);
+        return num !== 0 ? 1 / num : 0;
+    });
+    
+    // Absolute value |x|
+    expression = expression.replace(/\|([^|]+)\|/g, (match, value) => {
+        const num = parseFloat(value);
+        return Math.abs(num);
+    });
+    
+    // Negate -(x)
+    expression = expression.replace(/-\(([^)]+)\)/g, (match, value) => {
+        const num = parseFloat(value);
+        return -num;
+    });
+    
+    // Percent x%
+    expression = expression.replace(/(\d+(?:\.\d+)?)%/g, (match, value) => {
+        const num = parseFloat(value);
+        return num / 100;
+    });
+    
+    // Constants
+    expression = expression.replace(/π/g, Math.PI);
+    expression = expression.replace(/\be\b/g, Math.E);
+    
+    return expression;
 }
 
 // Expression evaluation function
@@ -178,81 +264,98 @@ function evaluateExpression(expression) {
 function executeFunction(func) {
     let value;
     
+    // Get the current value to apply the function to
     if (calculatorState.shouldClearDisplay || calculatorState.currentExpression === '') {
-        value = parseFloat(calculatorState.lastResult) || 0;
+        value = calculatorState.lastResult;
     } else {
         const parts = calculatorState.currentExpression.split(/[\+\-\*\/]/);
         const lastPart = parts[parts.length - 1].trim();
-        value = parseFloat(lastPart) || 0;
+        value = lastPart || calculatorState.lastResult;
     }
     
-    let result;
-
-    try {
-        switch (func) {
-            case 'sin':
-                result = Math.sin(toRadians(value));
-                break;
-            case 'cos':
-                result = Math.cos(toRadians(value));
-                break;
-            case 'tan':
-                result = Math.tan(toRadians(value));
-                break;
-            case 'log':
-                result = value > 0 ? Math.log10(value) : 0;
-                break;
-            case 'ln':
-                result = value > 0 ? Math.log(value) : 0;
-                break;
-            case 'sqrt':
-                result = value >= 0 ? Math.sqrt(value) : 0;
-                break;
-            case 'pow':
-                result = Math.pow(value, 2);
-                break;
-            case 'factorial':
-                result = factorial(Math.floor(value));
-                break;
-            case 'pi':
-                result = Math.PI;
-                break;
-            case 'e':
-                result = Math.E;
-                break;
-            case 'percent':
-                result = value / 100;
-                break;
-            case 'inverse':
-                result = value !== 0 ? 1 / value : 0;
-                break;
-            case 'abs':
-                result = Math.abs(value);
-                break;
-            case 'negate':
-                result = -value;
-                break;
-            case 'exp':
-                result = Math.exp(value);
-                break;
-            default:
-                return;
-        }
-
-        if (isNaN(result) || !isFinite(result)) {
-            result = 0;
-        }
-
-        const formattedResult = formatResult(result);
-        calculatorState.currentExpression = formattedResult;
-        calculatorState.lastResult = formattedResult;
-        updateDisplay(formattedResult);
-        calculatorState.shouldClearDisplay = true;
-        
-    } catch (error) {
-        updateDisplay('Error');
-        calculatorState.shouldClearDisplay = true;
+    // Build the function notation that displays on the screen when the scientific function is pressed until the equals button is pressed
+    //Also, the function notation should be updated every time the scientific function is pressed
+    //Also, no need for the try catch block in my opinion, because the input is already validated and using a wrong value for the function will automatically result in 0
+    
+    let functionNotation;
+    
+    switch (func) {
+        case 'sin':
+            functionNotation = `sin(${value})`;
+            break;
+        case 'cos':
+            functionNotation = `cos(${value})`;
+            break;
+        case 'tan':
+            functionNotation = `tan(${value})`;
+            break;
+        case 'log':
+            functionNotation = `log(${value})`;
+            break;
+        case 'ln':
+            functionNotation = `ln(${value})`;
+            break;
+        case 'sqrt':
+            functionNotation = `√(${value})`;
+            break;
+        case 'pow':
+            functionNotation = `(${value})²`;
+            break;
+        case 'factorial':
+            functionNotation = `${value}!`;
+            break;
+        case 'pi':
+            // If there's a number before, treat it as multiplication (e.g., 3π = 3 * π)
+            if (value && value !== '0') {
+                functionNotation = `${value} * π`;
+            } else {
+                functionNotation = 'π';
+            }
+            break;
+        case 'e':
+            // If there's a number before, treat it as multiplication (e.g., 12e = 12 * e)
+            if (value && value !== '0') {
+                functionNotation = `${value} * e`;
+            } else {
+                functionNotation = 'e';
+            }
+            break;
+        case 'percent':
+            functionNotation = `${value}%`;
+            break;
+        case 'inverse':
+            functionNotation = `1/(${value})`;
+            break;
+        case 'abs':
+            functionNotation = `|${value}|`;
+            break;
+        case 'negate':
+            functionNotation = `-(${value})`;
+            break;
+        case 'exp':
+            functionNotation = `exp(${value})`;
+            break;
+        default:
+            return;
     }
+    
+    // Update the expression with the function notation
+    if (calculatorState.shouldClearDisplay || calculatorState.currentExpression === '') {
+        calculatorState.currentExpression = functionNotation;
+    } else {
+        // Replace the last number with the function notation
+        const parts = calculatorState.currentExpression.split(/(\s[\+\-\*\/]\s)/);
+        if (parts.length > 1) {
+            parts[parts.length - 1] = functionNotation;
+            calculatorState.currentExpression = parts.join('');
+        } else {
+            calculatorState.currentExpression = functionNotation;
+        }
+    }
+    
+    calculatorState.shouldClearDisplay = false;
+    updateDisplay(calculatorState.currentExpression);
+    updateHistory(calculatorState.currentExpression);
 }
 
 // Helper functions
@@ -310,6 +413,26 @@ function deleteChar() {
 // Display functions
 function updateDisplay(value) {
     calculatorState.display.textContent = value;
+    
+    // Dynamically adjust font size based on text length
+    const textLength = value.length;
+    let fontSize;
+    
+    if (textLength <= 10) {
+        fontSize = '2.5em';
+    } else if (textLength <= 15) {
+        fontSize = '2em';
+    } else if (textLength <= 20) {
+        fontSize = '1.6em';
+    } else if (textLength <= 25) {
+        fontSize = '1.3em';
+    } else if (textLength <= 30) {
+        fontSize = '1.1em';
+    } else {
+        fontSize = '0.9em';
+    }
+    
+    calculatorState.display.style.fontSize = fontSize;
 }
 
 function updateHistory(value) {
